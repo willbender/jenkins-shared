@@ -32,6 +32,16 @@ def call(Map arguments=[:]) {
                     sh 'npm test' 
                 }
             }
+            //Scan docker image vulnerabilities
+            stage('Dockerfile Linting'){
+                agent any
+                steps{
+                    script{
+                        def vulnerabilities = sh(script: "docker run --rm -i hadolint/hadolint < Dockerfile", returnStdout: true).trim()
+                        echo "Docker Linting Report:\n${vulnerabilities}"
+                    }
+                }
+            }
             //Build stage to build the docker images
             stage('Docker Build') { 
                 agent  any
@@ -56,7 +66,7 @@ def call(Map arguments=[:]) {
                 agent any
                 steps{
                     script{
-                        def vulnerabilities = sh(script: "docker run aquasec/trivy:0.49.0 image --exit-code 0 --severity HIGH,MEDIUM,LOW --no-progress ${registry}:${env.BRANCH_NAME}", returnStdout: true).trim()
+                        def vulnerabilities = sh(script: "docker run aquasec/trivy:0.49.0 image --exit-code 0 --severity HIGH,MEDIUM,LOW --no-progress ${registry}/:node${env.BRANCH_NAME}:1.0", returnStdout: true).trim()
                         echo "Vulnerability Report:\n${vulnerabilities}"
                     }
                 }
