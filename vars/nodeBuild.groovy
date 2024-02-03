@@ -66,8 +66,9 @@ def call(Map arguments=[:]) {
                 agent any
                 steps{
                     script{
-                        def vulnerabilities = sh(script: "docker run -v /var/run/docker.sock:/var/run/docker.sock -v library-cache:/root/.cache/ aquasec/trivy:0.49.0 image --exit-code 0 --severity HIGH,MEDIUM,LOW --no-progress ${registry}/node${env.BRANCH_NAME}:1.0", returnStdout: true).trim()
+                        def vulnerabilities = sh(script: "docker run -v /var/run/docker.sock:/var/run/docker.sock -v library-cache:/root/.cache/ aquasec/trivy:0.49.0 image --format template --template '@contrib/html.tpl' -o vulnerability-report.html --exit-code 0 --severity HIGH,MEDIUM,LOW --no-progress ${registry}/node${env.BRANCH_NAME}:1.0", returnStdout: true).trim()
                         echo "Vulnerability Report:\n${vulnerabilities}"
+                        archiveArtifacts artifacts: 'vulnerability-report.html'
                     }
                 }
             }
