@@ -59,11 +59,11 @@ def call(Map arguments=[:]) {
                     docker {
                         image 'aquasec/trivy:0.49.0'
                     }
-                    steps{
-                        script{
-                            def vulnerabilities = sh(script: "trivy image --exit-code 0 --severity HIGH,MEDIUM,LOW --no-progress ${registry}:${env.BRANCH_NAME}", returnStdout: true).trim()
-                            echo "Vulnerability Report:\n${vulnerabilities}"
-                        }
+                }
+                steps{
+                    script{
+                        def vulnerabilities = sh(script: "trivy image --exit-code 0 --severity HIGH,MEDIUM,LOW --no-progress ${registry}:${env.BRANCH_NAME}", returnStdout: true).trim()
+                        echo "Vulnerability Report:\n${vulnerabilities}"
                     }
                 }
             }
